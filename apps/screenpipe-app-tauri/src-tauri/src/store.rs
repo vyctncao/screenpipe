@@ -1577,13 +1577,10 @@ impl SettingsStore {
     }
 
     pub fn app_entitled_or_dev(&self) -> bool {
-        // Debug builds (`bun tauri dev`, e2e, signed dev builds) are never gated.
-        // Release builds must not be bypassable via a runtime env var.
-        if cfg!(debug_assertions) {
-            return true;
-        }
-
-        self.has_current_app_entitlement()
+        // fork patch: entitlement/plan gate removed in the Rust backend too, so
+        // the :3030 server + capture engine start without a screenpipe account
+        // or paid plan (release builds included). Mirrors the frontend patch.
+        true
     }
 
     fn has_current_app_entitlement(&self) -> bool {

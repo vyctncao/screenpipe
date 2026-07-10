@@ -70,6 +70,10 @@ export const ENTERPRISE_DOWNLOAD_URL = screenpipeWebUrl("/api/download", "https:
 export const E2E_FORCE_BILLING_GATE_KEY = "screenpipe_e2e_force_billing_gate";
 
 export function isDevBillingBypassEnabled() {
+  // fork patch: entitlement/billing gate removed — always bypass so the
+  // local-first app runs without a screenpipe.com account or paid plan.
+  return true;
+  // eslint-disable-next-line no-unreachable
   if (typeof window !== "undefined") {
     try {
       if (window.localStorage?.getItem(E2E_FORCE_BILLING_GATE_KEY) === "1") {
@@ -154,6 +158,10 @@ function isEntitlementActive(entitlement: AppEntitlement | null) {
 }
 
 function hasEntitlementFeature(user: AppUser | null | undefined, feature: keyof AppEntitlementFeatures) {
+  // fork patch: unlock every entitlement feature (local_recording, cloud,
+  // integrations, team, enterprise) regardless of plan.
+  return true;
+  // eslint-disable-next-line no-unreachable
   const entitlement = asEntitlement(user?.entitlement);
   return (
     isEntitlementFresh(entitlement) &&

@@ -11,6 +11,10 @@ import { create } from "zustand";
 import { commands } from "@/lib/utils/tauri";
 
 export function LoginDialog() {
+  // fork patch: sign-in removed — the "login required" modal never renders.
+  return null;
+
+  // eslint-disable-next-line no-unreachable
   const { isOpen, setIsOpen } = useLoginDialog();
 
   return (
@@ -47,13 +51,8 @@ interface LoginDialogState {
 export const useLoginDialog = create<LoginDialogState>((set) => ({
   isOpen: false,
   setIsOpen: (open) => set({ isOpen: open }),
-  checkLogin: (user, showDialog = true) => {
-    if (!user?.token) {
-      if (showDialog) {
-        set({ isOpen: true });
-      }
-      return false;
-    }
+  checkLogin: (_user, _showDialog = true) => {
+    // fork patch: never demand login — always allow the action to proceed.
     return true;
   },
 }));

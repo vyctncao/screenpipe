@@ -956,22 +956,9 @@ fn create_dynamic_menu(
     }
 
     // --- Plan / usage info ---
-    if !data.app_ui_hidden && !is_tray_item_hidden("tray_plan") {
-        let plan_label = plan_display_name(data.subscription_plan.as_deref());
-        let has_cloud = data.cloud_subscribed;
-        menu_builder = menu_builder.item(&PredefinedMenuItem::separator(app)?);
-        menu_builder = menu_builder.item(
-            &MenuItemBuilder::with_id("plan_info", format!("{} plan", plan_label))
-                .enabled(false)
-                .build(app)?,
-        );
-        // Anyone without cloud (Free, Basic, or Lifetime-only) can move up to
-        // Business to add cloud sync, cloud AI, and integrations.
-        if !has_cloud {
-            menu_builder = menu_builder
-                .item(&MenuItemBuilder::with_id("upgrade", "⚡ Upgrade to Business").build(app)?);
-        }
-    }
+    // fork patch: removed the tray "<plan> plan" label and the
+    // "⚡ Upgrade to Business" item — bare local app, no plans or upgrades.
+    let _ = plan_display_name(None);
 
     // --- Update item (if available) ---
     if !data.app_ui_hidden {

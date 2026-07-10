@@ -1041,7 +1041,8 @@ function HomeContent() {
               {/* Bottom items */}
               <div className={cn("space-y-0.5 border-t pt-2", isTranslucent ? "vibrant-sidebar-border" : "border-border")}>
                 {/* Team link — hide invite promo in enterprise (unless team exists) */}
-                {(!isSectionHidden("team") || teamState.team) && (() => {
+                {/* fork patch: removed "Invite your team" — bare local app */}
+                {false && (!isSectionHidden("team") || teamState.team) && (() => {
                   const teamLabel = teamState.team
                     ? `Your team (${teamState.members.length})`
                     : "Invite your team";
@@ -1061,7 +1062,8 @@ function HomeContent() {
                 })()}
 
                 {/* Get free month — hidden in enterprise */}
-                {!isSectionHidden("referral") && (() => {
+                {/* fork patch: removed "Get free month" referral promo — bare local app */}
+                {false && !isSectionHidden("referral") && (() => {
                   const btn = (
                     <button
                       onClick={() => openSettings("referral")}

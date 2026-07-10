@@ -251,20 +251,8 @@ function SettingsContent() {
         { id: "speakers" as const, label: "Speakers", icon: <Mic className="h-4 w-4" /> },
       ].filter((s) => !isSectionHidden(s.id)),
     },
-    {
-      label: "Account",
-      items: [
-        // Hide "Team" on enterprise builds — those installs are already
-        // org-managed; the desktop has nothing to manage. Admins use the
-        // /enterprise dashboard on the web. On consumer builds we still
-        // surface Team as a marketing entry point to /team.
-        ...(isEnterprise
-          ? []
-          : [{ id: "team" as const, label: "Team", icon: <Users className="h-4 w-4" /> }]),
-        { id: "account" as const, label: "Account", icon: <User className="h-4 w-4" /> },
-        { id: "referral" as const, label: "Get free month", icon: <Gift className="h-4 w-4" /> },
-      ].filter((s) => !isSectionHidden(s.id)),
-    },
+    // fork patch: removed the "Account" settings group entirely — no sign in,
+    // no plans / business plans, no team, no get-free-month. Bare local app.
   ];
 
   type NavItem = { id: string; label: string; icon: React.ReactNode };

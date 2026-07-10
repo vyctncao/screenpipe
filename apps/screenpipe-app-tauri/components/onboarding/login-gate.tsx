@@ -248,12 +248,14 @@ const OnboardingLogin: React.FC<OnboardingLoginProps> = ({ handleNextSlide }) =>
   }, []);
 
   useEffect(() => {
-    if (settings.user?.token && entitled && !hasAdvanced.current) {
+    // fork patch: gate removed — advance past the login step automatically when
+    // the billing bypass is on, even without a session token.
+    if ((canSkipLogin || (settings.user?.token && entitled)) && !hasAdvanced.current) {
       hasAdvanced.current = true;
       posthog.capture("onboarding_login_completed");
       setTimeout(() => handleNextSlide(), 500);
     }
-  }, [entitled, settings.user, settings.user?.token, handleNextSlide]);
+  }, [canSkipLogin, entitled, settings.user, settings.user?.token, handleNextSlide]);
 
   // Signed in but not entitled is usually entitlement propagation lag (a brand-new
   // enterprise member, or a just-completed checkout) where store.bin still has the
