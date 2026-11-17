@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Rocket, Moon, Sun, Monitor, FlaskConical, ExternalLink, Layers, RefreshCw, MessageSquare, Sparkles, Lock } from "lucide-react";
+import { Rocket, Moon, Sun, Monitor, FlaskConical, ExternalLink, Layers, RefreshCw, MessageSquare, Lock } from "lucide-react";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
 import { CloudMediaAnalysisPreview } from "./setting-previews";
 import { useToast } from "@/components/ui/use-toast";
@@ -27,7 +27,6 @@ export const searchIndex: SettingsField[] = [
   { label: "Auto-update", keywords: ["updates"] },
   { label: "Check for updates", keywords: ["version"] },
   { label: "Auto-Update Pipes" },
-  { label: "Enhanced AI", keywords: ["cloud"] },
   { label: "AI audio & video analysis", keywords: ["transcription", "transcribe", "video", "image", "enclave", "confidential", "media", "vision", "audio"] },
   { label: "Auto-generate chat titles" },
   { label: "Reset Onboarding", keywords: ["setup"] },
@@ -346,36 +345,11 @@ export default function GeneralSettings() {
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card">
-          <CardContent className="px-3 py-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <Sparkles className="h-4 w-4 text-muted-foreground shrink-0" />
-                <div>
-                  <h3 className="text-sm font-medium text-foreground">Enhanced AI</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Use Screenpipe Cloud for smarter suggestions
-                  </p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-0.5">
-                    sends recent activity to screenpipe cloud for processing. we don&apos;t store your data (zero retention).
-                  </p>
-                </div>
-              </div>
-              <Switch
-                id="enhanced-ai-toggle"
-                checked={settings?.enhancedAI ?? false}
-                onCheckedChange={async (checked) => {
-                  handleSettingsChange({ enhancedAI: checked });
-                  const token = settings?.user?.token || "";
-                  try {
-                    await commands.setEnhancedAiSuggestions(checked, token);
-                  } catch {}
-                }}
-                className="ml-4"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        {/* "Enhanced AI" card removed in this build — it existed solely to
+            opt into sending recent activity to the hosted screenpipe cloud
+            for suggestion generation. The `enhancedAI` setting and its
+            backing command are left in place; this build just never turns
+            it on from the UI. */}
 
         {/* AI audio & video analysis — audio / video / image via Gemma 4 E4B
             inside our Tinfoil enclave. Toggle adds/removes the section from

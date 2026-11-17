@@ -68,7 +68,7 @@ export function isHostedScreenpipeProvider(provider?: string | null): boolean {
 }
 
 export function buildCloudConnectionMessage(): string {
-  return "Can't reach screenpipe cloud right now — this is usually a brief outage on our end, not your setup. Wait a few seconds and try again.";
+  return "Can't reach the hosted gateway right now — this is usually a brief outage upstream, not your setup. Wait a few seconds and try again.";
 }
 
 export function buildRemoteConnectionMessage(provider?: string | null): string {

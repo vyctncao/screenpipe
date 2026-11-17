@@ -38,7 +38,7 @@ describe("provider error copy", () => {
       model: "auto",
     });
 
-    expect(msg).toContain("screenpipe cloud");
+    expect(msg).toContain("hosted gateway");
     expect(msg?.toLowerCase()).toContain("try again");
     // does not blame the user's own machine/setup
     expect(msg?.toLowerCase()).not.toContain("ollama");
@@ -52,7 +52,7 @@ describe("provider error copy", () => {
     ]) {
       expect(
         buildProviderErrorMessage(raw, { provider: "screenpipe-cloud", model: "auto" })
-      ).toContain("screenpipe cloud");
+      ).toContain("hosted gateway");
     }
   });
 
@@ -112,7 +112,7 @@ describe("provider error copy", () => {
   it("is case-insensitive on the gateway signatures", () => {
     expect(
       buildProviderErrorMessage("TLS HANDSHAKE EOF", { provider: "screenpipe-cloud" })
-    ).toContain("screenpipe cloud");
+    ).toContain("hosted gateway");
   });
 
   it("turns raw context-window JSON into actionable chat copy", () => {

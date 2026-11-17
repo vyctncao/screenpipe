@@ -184,7 +184,7 @@ const getAppIconUrl = (appName: string): string => {
 const FALLBACK_TRANSCRIPTION_ENGINE = "whisper-large-v3-turbo-quantized";
 
 const TRANSCRIPTION_ENGINE_LABELS: Record<string, string> = {
-  "screenpipe-cloud": "Screenpipe Cloud",
+  "screenpipe-cloud": "Hosted cloud (legacy)",
   deepgram: "Deepgram",
   "whisper-large-v3-turbo": "Whisper Turbo",
   "whisper-large-v3-turbo-quantized": "Whisper Turbo (fast)",
@@ -301,7 +301,7 @@ const getAudioFallbackMessage = (reason: AudioEngineFallbackReason) => {
     case "notLoggedIn":
       return "You are not logged in, so audio is being transcribed locally.";
     case "notSubscribed":
-      return "Screenpipe Cloud requires an active subscription, so audio is being transcribed locally.";
+      return "The hosted cloud engine is unavailable in this build, so audio is being transcribed locally.";
     case "missingDeepgramKey":
       return "Deepgram has no API key configured, so audio is being transcribed locally.";
   }
@@ -2750,9 +2750,13 @@ Your screen is a pipe. Everything you see, hear, and type flows through it. Scre
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel className="text-[10px] text-muted-foreground/70 uppercase tracking-wider">cloud</SelectLabel>
-                      <SelectItem value="screenpipe-cloud" disabled={!hasCloudTranscriptionAccess}>
-                        Screenpipe Cloud {!hasCloudTranscriptionAccess && "(pro)"}{hwCapability?.recommendedEngine === "screenpipe-cloud" && " ★"}
-                      </SelectItem>
+                      {/* Screenpipe Cloud engine removed in this build. Rendered
+                          only when it is already the saved engine, so a legacy
+                          setting still displays instead of showing an empty
+                          select — it is never offered as a new choice. */}
+                      {settings.audioTranscriptionEngine === "screenpipe-cloud" && (
+                        <SelectItem value="screenpipe-cloud">Screenpipe Cloud (legacy)</SelectItem>
+                      )}
                       <SelectItem value="deepgram">Deepgram</SelectItem>
                     </SelectGroup>
                     <SelectGroup>
@@ -3246,7 +3250,7 @@ Your screen is a pipe. Everything you see, hear, and type flows through it. Scre
                 <div className="min-w-0">
                   <h3 className="text-sm font-medium text-foreground flex items-center gap-1.5">
                     Live meeting notes
-                    <HelpTooltip text="Streams only the active meeting into the live note. This is separate from background 24/7 recording and can use your selected transcription engine, screenpipe cloud, or a direct provider." />
+                    <HelpTooltip text="Streams only the active meeting into the live note. This is separate from background 24/7 recording and can use your selected transcription engine or a direct provider." />
                   </h3>
                   <p className="text-xs text-muted-foreground">Meeting-only live captions, separate from background transcription</p>
                 </div>
@@ -3266,7 +3270,10 @@ Your screen is a pipe. Everything you see, hear, and type flows through it. Scre
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="selected-engine">Current transcription engine</SelectItem>
-                      <SelectItem value="screenpipe-cloud">screenpipe cloud live</SelectItem>
+                      {/* "screenpipe cloud live" removed — legacy-only, see above. */}
+                      {settings.meetingLiveTranscriptionProvider === "screenpipe-cloud" && (
+                        <SelectItem value="screenpipe-cloud">screenpipe cloud live (legacy)</SelectItem>
+                      )}
                       <SelectItem value="deepgram-live">Direct Deepgram live</SelectItem>
                     </SelectContent>
                   </Select>
@@ -3292,7 +3299,8 @@ Your screen is a pipe. Everything you see, hear, and type flows through it. Scre
               !settings.user?.token &&
               !settings.user?.id && (
               <p className="mt-2 ml-[26px] text-xs text-muted-foreground">
-                Log in to screenpipe cloud to use the cloud live provider.
+                This build has no hosted cloud provider — pick another live
+                transcription option.
               </p>
             )}
             {(settings.meetingLiveTranscriptionEnabled ?? true) &&

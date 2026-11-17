@@ -453,30 +453,9 @@ export function AIProviderConfig({
           />
         </div>
 
-        <div className={cn(
-          "grid gap-2",
-          piAvailable ? "grid-cols-3" : "grid-cols-4"
-        )}>
-          {piAvailable && (
-            <Button
-              type="button"
-              disabled={!settings?.user?.token}
-              variant={selectedProvider === "screenpipe-cloud" ? "default" : "outline"}
-              className="flex h-8 items-center justify-center gap-1.5 text-xs px-3"
-              onClick={() => {
-                setSelectedProvider("screenpipe-cloud");
-                setFormData({
-                  ...formData,
-                  provider: "screenpipe-cloud",
-                  url: "",
-                  model: "auto",
-                });
-              }}
-            >
-              <Icons.terminal className="h-3.5 w-3.5" />
-              <span>screenpipe cloud</span>
-            </Button>
-          )}
+        {/* Screenpipe Cloud button removed in this build — three providers
+            remain (ChatGPT, Ollama, Custom), so the grid is a fixed 3 cols. */}
+        <div className={cn("grid gap-2", "grid-cols-3")}>
 
           <Button
             type="button"
@@ -1373,27 +1352,10 @@ export const AIPresetsSelector = ({
   return (
     <>
       <div className={cn("flex flex-col w-full gap-2", containerClassName)}>
-        {!isControlled && selectedPresetRequiresLogin && !showModelOnly && (
-          <div className="flex items-center gap-2 p-2 text-sm bg-muted border border-border rounded-lg">
-            <AlertTriangle className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span className="text-foreground flex-1">
-              Login required to use Screenpipe Cloud
-            </span>
-            {showLoginCta && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0 h-7 text-xs border-border hover:bg-muted"
-                onClick={async () => {
-                  await commands.showWindow({ Home: { page: "account" } });
-                }}
-              >
-                <LogIn className="h-3 w-3 mr-1" />
-                Login
-              </Button>
-            )}
-          </div>
-        )}
+        {/* "Login required to use Screenpipe Cloud" banner removed in this
+            build. `selectedPresetRequiresLogin` is still computed and still
+            drives the amber outline on the trigger below, so a pre-existing
+            cloud preset remains visibly flagged without prompting a login. */}
         <div className="flex w-full items-center gap-2">
         <Popover open={open} onOpenChange={setOpen}>
           <TooltipProvider>

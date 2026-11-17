@@ -134,16 +134,6 @@ const formatPresetName = (name: string): string => {
   return name;
 };
 
-const isLocalhostUrl = (url?: string): boolean => {
-  if (!url) return false;
-  try {
-    const hostname = new URL(url).hostname.toLowerCase();
-    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
-  } catch {
-    return false;
-  }
-};
-
 type DiagnosticStatus = "pass" | "fail" | "skip" | "pending" | "running";
 
 interface DiagnosticStepResult {
@@ -636,6 +626,7 @@ const AISection = ({
 
     // Determine models URL
     const isAnthropic = settingsPreset?.provider === "anthropic";
+    const isCustom = settingsPreset?.provider === "custom";
     let modelsUrl: string;
     if (settingsPreset?.provider === "native-ollama") {
       modelsUrl = "http://localhost:11434/api/tags";
@@ -687,11 +678,11 @@ const AISection = ({
         chat: { status: "running", message: "Sending test message..." },
       }));
     } else {
-      // Local custom providers often do not implement browser CORS preflight on /models.
-      const modelsFetchFn =
-        settingsPreset?.provider === "custom" && isLocalhostUrl(settingsPreset?.url)
-          ? tauriFetch
-          : fetch;
+      // Custom providers rarely implement browser CORS preflight on /models —
+      // local servers because they never expected a browser, remote gateways
+      // because they only expect server-side SDK callers. Either way the
+      // webview's fetch gets blocked, so go through the Rust HTTP client.
+      const modelsFetchFn = isCustom ? tauriFetch : fetch;
       try {
         modelsResponse = await modelsFetchFn(modelsUrl, {
           headers,
@@ -825,8 +816,8 @@ const AISection = ({
       chatHeaders["OpenAI-Beta"] = "responses=experimental";
     }
 
-    // Use tauriFetch for chatgpt.com and Anthropic to bypass CORS
-    const fetchFn = (isChatGpt || isAnthropic) ? tauriFetch : fetch;
+    // Use tauriFetch for chatgpt.com, Anthropic, and custom gateways to bypass CORS
+    const fetchFn = (isChatGpt || isAnthropic || isCustom) ? tauriFetch : fetch;
 
     const chatStart = performance.now();
     try {
@@ -964,8 +955,9 @@ const AISection = ({
           break;
         case "custom":
           try {
-            const customFetchFn = isLocalhostUrl(settingsPreset?.url) ? tauriFetch : fetch;
-            const customResponse = await customFetchFn(
+            // Rust-side client: custom endpoints (local or remote) generally
+            // send no CORS headers, which would block the webview's fetch.
+            const customResponse = await tauriFetch(
               `${settingsPreset?.url}/models`,
               {
                 headers: settingsPreset.apiKey
@@ -1249,18 +1241,11 @@ const AISection = ({
             onClick={() => handleAiProviderChange("native-ollama")}
           />
 
-          {piAvailable && (!isEnterprise || aiPresetPolicy.allow_screenpipe_cloud) && (
-            <AIProviderCard
-              type="screenpipe-cloud"
-              title="Screenpipe Cloud"
-              description="AI coding agent powered by Screenpipe Cloud. Requires login."
-              imageSrc="/images/screenpipe.png"
-              selected={settingsPreset?.provider === "screenpipe-cloud"}
-              onClick={() => handleAiProviderChange("screenpipe-cloud")}
-              disabled={!settings.user?.token}
-              warningText={!settings.user?.token ? "Login required" : undefined}
-            />
-          )}
+          {/* Screenpipe Cloud provider card removed in this build — this fork
+              runs against a self-configured gateway (Custom provider) instead
+              of the hosted cloud, so the card is not offered. The underlying
+              "screenpipe-cloud" provider code paths are left intact so any
+              pre-existing preset keeps working. */}
 
         </div>
       </div>
@@ -1636,7 +1621,7 @@ const AISection = ({
               </p>
               <p>
                 GPU strongly recommended. without a dedicated GPU, local models will be very slow and pipes may time out.
-                for best results consider screenpipe cloud or groq as custom provider.
+                for best results consider a hosted gateway (groq, or your own) as a custom provider.
               </p>
             </div>
           )}
